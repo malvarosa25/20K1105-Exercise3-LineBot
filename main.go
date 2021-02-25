@@ -71,8 +71,11 @@ func main() {
 						log.Print(err)
 					}
 					time.Sleep(1 * time.Minute)
-					replyMessage = fmt.Sprintf(
-						"%sさんの学習終了時間となりました。", message.Text)
+					pushMessage := fmt.Sprintf("%sさんの学習終了時間となりました。", message.Text)
+					userID := event.Source.UserID
+					if _, err := bot.PushMessage(userID, linebot.NewTextMessage(pushMessage)).Do(); err != nil {
+						log.Print(err)
+					}
 				}
 			}
 		}
