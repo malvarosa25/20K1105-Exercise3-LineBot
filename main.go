@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/line/line-bot-sdk-go/linebot"
 	_ "github.com/mattn/go-sqlite3" // 使用しないため、 _ にしないとコンパイルエラーとなる
@@ -59,16 +60,19 @@ func main() {
 				log.Println(event)
 				switch message := event.Message.(type) { // ユーザが生徒の名前を入力
 				case *linebot.TextMessage:
-					time, err := scanTable(Db, message.Text) // 入力された生徒に対応する学習時間を調べる
+					minute, err := scanTable(Db, message.Text) // 入力された生徒に対応する学習時間を調べる
 					if err != nil {
 						log.Println(err)
 					}
 					replyMessage := fmt.Sprintf(
 						"%sさんが入室しました。%d 分後に学習終了時間をお知らせします。",
-						message.Text, time)
+						message.Text, minute)
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
 						log.Print(err)
 					}
+					time.Sleep(minute * time.Minute)
+					replyMessage := fmt.Sprintf(
+						"%sさんの学習終了時間となりました。", message.Text)
 				}
 			}
 		}
