@@ -68,17 +68,26 @@ func main() {
 				log.Println(event)
 				switch message := event.Message.(type) { // ユーザが生徒の名前を入力
 				case *linebot.TextMessage:
-					minute, err := ScanTable(Db, message.Text) // 入力された生徒に対応する学習時間を調べる
+					// minute, err := ScanTable(Db, message.Text)
+
+					// 入力された生徒に対応する学習時間を調べる
+					sql := `SELECT * FROM student WHERE Name = ?`
+					var Minute int
+					err := Db.QueryRow(sql, message.Text).Scan(&Minute)
+					if err != nil {
+						log.Println(err)
+					}
+
 					if err != nil {
 						log.Println(err)
 					}
 					replyMessage := fmt.Sprintf(
 						"%sさんが入室しました。%d 分後に学習終了時間をお知らせします。",
-						message.Text, minute)
+						message.Text, Minute)
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
 						log.Print(err)
 					}
-					time.Sleep(time.Duration(minute) * time.Minute)
+					time.Sleep(time.Duration(Minute) * time.Minute)
 					pushMessage := fmt.Sprintf("%sさんの学習終了時間となりました。", message.Text)
 					userID := event.Source.UserID
 					if _, err := bot.PushMessage(userID, linebot.NewTextMessage(pushMessage)).Do(); err != nil {
@@ -119,6 +128,7 @@ func InsertTable(db *sql.DB, student *Student) error {
 	return nil
 }
 
+/*
 // Student テーブルから情報を選択する
 func ScanTable(db *sql.DB, name string) (int, error) {
 	sql := `SELECT * FROM student WHERE Name = ?`
@@ -129,3 +139,4 @@ func ScanTable(db *sql.DB, name string) (int, error) {
 	}
 	return Minute, nil
 }
+*/
