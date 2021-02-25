@@ -1,4 +1,4 @@
-module line-bot
+module LineBot
 
 go 1.15
 
