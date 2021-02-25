@@ -89,7 +89,7 @@ func main() {
 // Student テーブルの作成
 func createTable(db *sql.DB) error {
 	const sql = `CREATE TABLE IF NOT EXISTS student(
-		Name TEXT NOT NULL,
+		Name STRING NOT NULL,
 		Minute INTEGER NOT NULL
 	);`
 
@@ -116,8 +116,9 @@ func insertTable(db *sql.DB, students []*Student) error {
 
 // Student テーブルから情報を選択する
 func scanTable(db *sql.DB, name string) (int, error) {
+	sql := `SELECT * FROM student WHERE Name = ?`
 	var Minute int
-	err := db.QueryRow(`SELECT * FROM student WHERE Name = ?`, name).Scan(&Minute)
+	err := db.QueryRow(sql, name).Scan(&Minute)
 	if err != nil {
 		log.Println(err)
 	}
