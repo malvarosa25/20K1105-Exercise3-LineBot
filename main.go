@@ -32,15 +32,12 @@ func main() {
 	students := []*Student{{Name: "鈴宮 花子", Minute: 1}, {Name: "鈴宮 太郎", Minute: 2}, {Name: "鈴宮 次郎", Minute: 5}}
 
 	for i := range students {
-		const sql = "INSERT INTO student(name, minute) VALUES (?, ?)"
-		_, err := Db.Exec(sql, students[i].Name, students[i].Minute)
-		if err != nil {
+		if err := InsertTable(Db, students[i]); err != nil {
 			log.Fatalln(err)
 		}
 	}
 
 	err = Db.Ping() // DB の疎通確認
-
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -70,26 +67,17 @@ func main() {
 				log.Println(event)
 				switch message := event.Message.(type) { // ユーザが生徒の名前を入力
 				case *linebot.TextMessage:
-					// minute, err := ScanTable(Db, message.Text)
-
-					// 入力された生徒に対応する学習時間を調べる
-					sql := `SELECT * FROM student WHERE Name = ?`
-					var Minute int
-					err := Db.QueryRow(sql, message.Text).Scan(&Minute)
-					if err != nil {
-						log.Println(err)
-					}
-
+					minute, err := ScanTable(Db, message.Text)
 					if err != nil {
 						log.Println(err)
 					}
 					replyMessage := fmt.Sprintf(
 						"%sさんが入室しました。%d 分後に学習終了時間をお知らせします。",
-						message.Text, Minute)
+						message.Text, minute)
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
 						log.Print(err)
 					}
-					time.Sleep(time.Duration(Minute) * time.Minute)
+					time.Sleep(time.Duration(minute) * time.Minute)
 					pushMessage := fmt.Sprintf("%sさんの学習終了時間となりました。", message.Text)
 					userID := event.Source.UserID
 					if _, err := bot.PushMessage(userID, linebot.NewTextMessage(pushMessage)).Do(); err != nil {
@@ -120,7 +108,6 @@ func CreateTable(db *sql.DB) error {
 	return nil
 }
 
-/*
 // Student テーブルに生徒情報を追加する
 func InsertTable(db *sql.DB, student *Student) error {
 	const sql = "INSERT INTO student(name, minute) VALUES (?, ?)"
@@ -130,7 +117,6 @@ func InsertTable(db *sql.DB, student *Student) error {
 	}
 	return nil
 }
-
 
 // Student テーブルから情報を選択する
 func ScanTable(db *sql.DB, name string) (int, error) {
@@ -142,4 +128,3 @@ func ScanTable(db *sql.DB, name string) (int, error) {
 	}
 	return Minute, nil
 }
-*/
