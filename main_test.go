@@ -13,14 +13,21 @@ func TestofDatabase(t *testing.T) {
 		Name   string // 生徒の名前
 		Minute int    // 対象の生徒の学習制限時間
 	}
+	Db, err := sql.Open("sqlite3", "database.db")
+	if err != nil {
+		log.Println(err)
+	}
+
+	if err := CreateTable(Db); err != nil {
+		log.Println(err)
+	}
+
 	students := []*Student{{Name: "鈴宮 花子", Minute: 1}, {Name: "鈴宮 太郎", Minute: 2}, {Name: "鈴宮 次郎", Minute: 5}}
-	Db, _ := sql.Open("sqlite3", "database_test.db")
-	CreateTable(Db)
+
 	for i := range students {
 		if err := InsertTable(Db, students[i]); err != nil {
-			log.Println(err)
+			log.Fatalln(err)
 		}
-
 	}
 
 	cases := []string{"鈴宮 花子", "鈴宮 太郎", "鈴宮 次郎"}
