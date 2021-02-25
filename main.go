@@ -33,13 +33,8 @@ func main() {
 
 	for i := range students {
 		if err := InsertTable(Db, students[i]); err != nil {
-			log.Fatalln(err)
+			log.Println(err)
 		}
-	}
-
-	err = Db.Ping() // DB の疎通確認
-	if err != nil {
-		log.Fatalln(err)
 	}
 
 	// Line Developer にて立ち上げたチャネルの情報
@@ -67,17 +62,17 @@ func main() {
 				log.Println(event)
 				switch message := event.Message.(type) { // ユーザが生徒の名前を入力
 				case *linebot.TextMessage:
-					minute, err := ScanTable(Db, message.Text)
+					Minute, err := ScanTable(Db, message.Text)
 					if err != nil {
 						log.Println(err)
 					}
 					replyMessage := fmt.Sprintf(
 						"%sさんが入室しました。%d 分後に学習終了時間をお知らせします。",
-						message.Text, minute)
+						message.Text, Minute)
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
 						log.Print(err)
 					}
-					time.Sleep(time.Duration(minute) * time.Minute)
+					time.Sleep(time.Duration(Minute) * time.Minute)
 					pushMessage := fmt.Sprintf("%sさんの学習終了時間となりました。", message.Text)
 					userID := event.Source.UserID
 					if _, err := bot.PushMessage(userID, linebot.NewTextMessage(pushMessage)).Do(); err != nil {
@@ -95,11 +90,9 @@ func main() {
 
 // Student テーブルの作成
 func CreateTable(db *sql.DB) error {
-	const sql = `CREATE TABLE IF NOT EXISTS student(
-		Name STRING NOT NULL,
-		Minute INTEGER NOT NULL
-	);`
-
+	sql := `CREATE TABLE IF NOT EXISTS student(
+		Name STRING,
+		Minute INT)`
 	_, err := db.Exec(sql)
 	if err != nil {
 		log.Println(err)
@@ -110,7 +103,7 @@ func CreateTable(db *sql.DB) error {
 
 // Student テーブルに生徒情報を追加する
 func InsertTable(db *sql.DB, student *Student) error {
-	const sql = "INSERT INTO student(name, minute) VALUES (?, ?)"
+	sql := "INSERT INTO student(Name, Minute) VALUES (?, ?)"
 	_, err := db.Exec(sql, student.Name, student.Minute)
 	if err != nil {
 		log.Fatalln(err)
@@ -121,10 +114,10 @@ func InsertTable(db *sql.DB, student *Student) error {
 // Student テーブルから情報を選択する
 func ScanTable(db *sql.DB, name string) (int, error) {
 	sql := `SELECT * FROM student WHERE Name = ?`
-	var Minute int
-	err := db.QueryRow(sql, name).Scan(&Minute)
+	var s Student
+	err := db.QueryRow(sql, name).Scan(&s.Name, &s.Minute)
 	if err != nil {
 		log.Println(err)
 	}
-	return Minute, nil
+	return s.Minute, nil
 }
