@@ -36,7 +36,7 @@ func main() {
 				case *linebot.StickerMessage:
 					replyMessage := fmt.Println("生徒の ID を入力してください")
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
-						return fmt.Errorf("can't return a message: %w", err)
+						return fmt.Errorf("can't return a warning: %w", err)
 					}
 			}
 		}
