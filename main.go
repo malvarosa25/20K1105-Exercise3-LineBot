@@ -70,8 +70,8 @@ func main() {
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
 						log.Print(err)
 					}
-					time.Sleep(minute * time.Minute)
-					replyMessage := fmt.Sprintf(
+					time.Sleep(1 * time.Minute)
+					replyMessage = fmt.Sprintf(
 						"%sさんの学習終了時間となりました。", message.Text)
 				}
 			}
