@@ -11,6 +11,10 @@
   * 鈴宮 次郎 --> 5 分
 
 # 参考文献等
-* golangとHerokuとLinebotでオウム返しするbotを作成する。 (https://satoki252595.com/2020/08/10/linebot_01/#golang)
-* echo_bot (golang の LineBot 専用のライブラリ。上記のサイトでも参考にしている LineBot です。)  
+* golangとHerokuとLinebotでオウム返しするbotを作成する。  
+ ( heroku との連携や LINE API の使用法の参考にさせていただきました。) (https://satoki252595.com/2020/08/10/linebot_01/#golang)
+* echo_bot  
+(golang の LineBot 専用のライブラリ`line-bot-sdk-go`を用いた LineBot の一例。上記のサイトでも参考にしている LineBot です。)  
 (https://github.com/line/line-bot-sdk-go/blob/master/examples/echo_bot/server.go)
+* 【Golang】Goで決まった時間に論語を配信(Push)するLINE Botを作った  
+( Push を学ぶ際に参考にさせていただきました。) (https://tanaken.me/posts/190222/)
