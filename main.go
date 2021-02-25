@@ -29,7 +29,7 @@ func main() {
 		log.Println(err)
 	}
 
-	students := []*Student{{Name: "鈴宮 花子", Time: 5}, {Name: "鈴宮 太郎", Time: 10}, {Name: "鈴宮 次郎", Time: 15}}
+	students := []*Student{{Name: "鈴宮 花子", Time:5}, {Name: "鈴宮 太郎", Time:10}, {Name: "鈴宮 次郎", Time:15}}
 
 	if err := insertTable(Db, students); err != nil {
 		log.Println(err)
