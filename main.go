@@ -32,8 +32,10 @@ func main() {
 	students := []*Student{{Name: "鈴宮 花子", Minute: 1}, {Name: "鈴宮 太郎", Minute: 2}, {Name: "鈴宮 次郎", Minute: 5}}
 
 	for i := range students {
-		if err := InsertTable(Db, students[i]); err != nil {
-			log.Println(err)
+		const sql = "INSERT INTO student(name, minute) VALUES (?, ?)"
+		_, err := Db.Exec(sql, students[i].Name, students[i].Minute)
+		if err != nil {
+			log.Fatalln(err)
 		}
 	}
 
@@ -118,6 +120,7 @@ func CreateTable(db *sql.DB) error {
 	return nil
 }
 
+/*
 // Student テーブルに生徒情報を追加する
 func InsertTable(db *sql.DB, student *Student) error {
 	const sql = "INSERT INTO student(name, minute) VALUES (?, ?)"
@@ -128,7 +131,7 @@ func InsertTable(db *sql.DB, student *Student) error {
 	return nil
 }
 
-/*
+
 // Student テーブルから情報を選択する
 func ScanTable(db *sql.DB, name string) (int, error) {
 	sql := `SELECT * FROM student WHERE Name = ?`
