@@ -14,8 +14,8 @@ import (
 
 // 生徒のデータ格納用のユーザ定義型
 type Student struct {
-	Name string // 生徒の名前
-	Time int    // 対象の生徒の学習制限時間
+	Name   string // 生徒の名前
+	Minute int    // 対象の生徒の学習制限時間
 }
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 		log.Println(err)
 	}
 
-	students := []*Student{{Name: "鈴宮 花子", Time: 5}, {Name: "鈴宮 太郎", Time: 10}, {Name: "鈴宮 次郎", Time: 15}}
+	students := []*Student{{Name: "鈴宮 花子", Minute: 1}, {Name: "鈴宮 太郎", Minute: 2}, {Name: "鈴宮 次郎", Minute: 5}}
 
 	if err := insertTable(Db, students); err != nil {
 		log.Println(err)
@@ -70,7 +70,7 @@ func main() {
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
 						log.Print(err)
 					}
-					time.Sleep(1 * time.Minute)
+					time.Sleep(time.Duration(minute) * time.Minute)
 					pushMessage := fmt.Sprintf("%sさんの学習終了時間となりました。", message.Text)
 					userID := event.Source.UserID
 					if _, err := bot.PushMessage(userID, linebot.NewTextMessage(pushMessage)).Do(); err != nil {
@@ -90,7 +90,7 @@ func main() {
 func createTable(db *sql.DB) error {
 	const sql = `CREATE TABLE IF NOT EXISTS student(
 		Name TEXT NOT NULL,
-		Time INTEGER NOT NULL
+		Minute INTEGER NOT NULL
 	);`
 
 	_, err := db.Exec(sql)
@@ -104,8 +104,8 @@ func createTable(db *sql.DB) error {
 // Student テーブルに生徒情報を追加する
 func insertTable(db *sql.DB, students []*Student) error {
 	for i := range students {
-		const sql = "INSERT INTO student(name, time) VALUES (?, ?)"
-		_, err := db.Exec(sql, students[i].Name, students[i].Time)
+		const sql = "INSERT INTO student(name, minute) VALUES (?, ?)"
+		_, err := db.Exec(sql, students[i].Name, students[i].Minute)
 		if err != nil {
 			log.Println(err)
 		}
@@ -116,21 +116,10 @@ func insertTable(db *sql.DB, students []*Student) error {
 
 // Student テーブルから情報を選択する
 func scanTable(db *sql.DB, name string) (int, error) {
-	rows, err := db.Query(`SELECT * FROM student WHERE Name = ?`, name)
+	var Minute int
+	err := db.QueryRow(`SELECT * FROM student WHERE Name = ?`, name).Scan(&Minute)
 	if err != nil {
 		log.Println(err)
 	}
-
-	var s Student
-	err = rows.Scan(&s.Name, &s.Time)
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	if err := rows.Err(); err != nil {
-		log.Println(err)
-	}
-
-	return s.Time, nil
+	return Minute, nil
 }
