@@ -13,7 +13,6 @@ import (
 
 // 生徒のデータ格納用のユーザ定義型
 type Student struct {
-	Id   int64  // 生徒の ID
 	Name string // 生徒の名前
 	Time int    // 対象の生徒の学習制限時間
 }
@@ -29,7 +28,7 @@ func main() {
 		log.Println(err)
 	}
 
-	students := []*Student{{Name: "鈴宮 花子", Time:5}, {Name: "鈴宮 太郎", Time:10}, {Name: "鈴宮 次郎", Time:15}}
+	students := []*Student{{Name: "鈴宮 花子", Time: 5}, {Name: "鈴宮 太郎", Time: 10}, {Name: "鈴宮 次郎", Time: 15}}
 
 	if err := insertTable(Db, students); err != nil {
 		log.Println(err)
@@ -83,7 +82,6 @@ func main() {
 // Student テーブルの作成
 func createTable(db *sql.DB) error {
 	const sql = `CREATE TABLE IF NOT EXISTS student(
-		Id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		Name TEXT NOT NULL,
 		Time INTEGER NOT NULL
 	);`
@@ -100,15 +98,11 @@ func createTable(db *sql.DB) error {
 func insertTable(db *sql.DB, students []*Student) error {
 	for i := range students {
 		const sql = "INSERT INTO student(name, time) VALUES (?, ?)"
-		r, err := db.Exec(sql, students[i].Name, students[i].Time)
+		_, err := db.Exec(sql, students[i].Name, students[i].Time)
 		if err != nil {
 			log.Println(err)
 		}
-		id, err := r.LastInsertId()
-		if err != nil {
-			log.Println(err)
-		}
-		students[i].Id = id
+
 	}
 	return nil
 }
@@ -121,7 +115,7 @@ func scanTable(db *sql.DB, name string) (int, error) {
 	}
 
 	var s Student
-	err = rows.Scan(&s.Id, &s.Name, &s.Time)
+	err = rows.Scan(&s.Name, &s.Time)
 
 	if err != nil {
 		log.Println(err)
