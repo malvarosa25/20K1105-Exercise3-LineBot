@@ -64,7 +64,7 @@ func main() {
 						log.Println(err)
 					}
 					replyMessage := fmt.Sprintf(
-						"%s さんが入室しました。%d 分後に学習終了時間をお知らせします。",
+						"%sさんが入室しました。%d 分後に学習終了時間をお知らせします。",
 						message.Text, time)
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
 						log.Print(err)
@@ -107,9 +107,9 @@ func insertTable(db *sql.DB, students []*Student) error {
 	return nil
 }
 
-// Student テーブルから情報をスキャンする
+// Student テーブルから情報を選択する
 func scanTable(db *sql.DB, name string) (int, error) {
-	rows, err := db.Query("SELECT * FROM student WHERE Name = ?", name)
+	rows, err := db.Query(`SELECT * FROM student WHERE Name = ?`, name)
 	if err != nil {
 		log.Println(err)
 	}
