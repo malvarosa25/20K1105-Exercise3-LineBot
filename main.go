@@ -25,14 +25,16 @@ func main() {
 		log.Println(err)
 	}
 
-	if err := createTable(Db); err != nil {
+	if err := CreateTable(Db); err != nil {
 		log.Println(err)
 	}
 
 	students := []*Student{{Name: "鈴宮 花子", Minute: 1}, {Name: "鈴宮 太郎", Minute: 2}, {Name: "鈴宮 次郎", Minute: 5}}
 
-	if err := insertTable(Db, students); err != nil {
-		log.Println(err)
+	for i := range students {
+		if err := InsertTable(Db, students[i]); err != nil {
+			log.Println(err)
+		}
 	}
 
 	// Line Developer にて立ち上げたチャネルの情報
@@ -60,7 +62,7 @@ func main() {
 				log.Println(event)
 				switch message := event.Message.(type) { // ユーザが生徒の名前を入力
 				case *linebot.TextMessage:
-					minute, err := scanTable(Db, message.Text) // 入力された生徒に対応する学習時間を調べる
+					minute, err := ScanTable(Db, message.Text) // 入力された生徒に対応する学習時間を調べる
 					if err != nil {
 						log.Println(err)
 					}
@@ -87,7 +89,7 @@ func main() {
 }
 
 // Student テーブルの作成
-func createTable(db *sql.DB) error {
+func CreateTable(db *sql.DB) error {
 	const sql = `CREATE TABLE IF NOT EXISTS student(
 		Name STRING NOT NULL,
 		Minute INTEGER NOT NULL
@@ -102,20 +104,17 @@ func createTable(db *sql.DB) error {
 }
 
 // Student テーブルに生徒情報を追加する
-func insertTable(db *sql.DB, students []*Student) error {
-	for i := range students {
-		const sql = "INSERT INTO student(name, minute) VALUES (?, ?)"
-		_, err := db.Exec(sql, students[i].Name, students[i].Minute)
-		if err != nil {
-			log.Println(err)
-		}
-
+func InsertTable(db *sql.DB, student *Student) error {
+	const sql = "INSERT INTO student(name, minute) VALUES (?, ?)"
+	_, err := db.Exec(sql, student.Name, student.Minute)
+	if err != nil {
+		log.Fatalln(err)
 	}
 	return nil
 }
 
 // Student テーブルから情報を選択する
-func scanTable(db *sql.DB, name string) (int, error) {
+func ScanTable(db *sql.DB, name string) (int, error) {
 	sql := `SELECT * FROM student WHERE Name = ?`
 	var Minute int
 	err := db.QueryRow(sql, name).Scan(&Minute)
