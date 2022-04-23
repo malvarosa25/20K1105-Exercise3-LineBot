@@ -38,8 +38,8 @@ func main() {
 	}
 
 	// Line Developer にて立ち上げたチャネルの情報
-	Channel_Secret := "857d036768e6c23dd8731bec8d08312f"                                                                                                                                            // チャネルシークレット
-	Channel_Token := "+MVr5jo/PqWuzYfQ8G3DZyFPjmkf3qtVljqjA2M59TzNsVp4eA21Fr4N79kOuHZp+d3ZpqkweRH+ylrLmUdN+s/UFCGSHMNg8oeSq+EKJqUD8cUvzJHJBVU1U97tFnKSd+a+yTMYWyp+lJe7vvIZagdB04t89/1O/w1cDnyilFU=" // チャネルアクセストークン（長期）
+	Channel_Secret := "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"     // チャネルシークレット
+	Channel_Token := "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" // チャネルアクセストークン（長期）
 	bot, err := linebot.New(Channel_Secret, Channel_Token)
 	if err != nil {
 		log.Println(err)
